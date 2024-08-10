@@ -1,0 +1,34 @@
+# Architecture dependent
+mcpu=cortex-m4 
+-mfpu=fpv4-sp-d16 
+-mfloat-abi=hard 
+-mthumb
+
+# for generating the object files
+-c 
+
+-std=gnu11 
+-O0 
+-g3 
+-Wall 
+
+# Definition of the DEBUG macro, I do not know if its for their hal
+-DDEBUG 
+
+# Stuff for using their hal which i will not need
+-DSTM32F411xE 
+-DUSE_STM32F411E_DISCO 
+-DUSE_HAL_DRIVER 
+-I../../Inc 
+-I../../Drivers/CMSIS/Device/ST/STM32F4xx/Include 
+-I../../Drivers/STM32F4xx_HAL_Driver/Inc 
+-I../../Drivers/BSP/STM32F411E-Discovery 
+-I../../Drivers/CMSIS/Include 
+
+# What are these ?
+--specs=nano.specs 
+-ffunction-sections 
+-fdata-sections 
+-fstack-usage 
+-fcyclomatic-complexity 
+
