@@ -1,46 +1,47 @@
-ENTRY(_Reset)
+ENTRY(resetHandler)
 
 MEMORY {
-    FLASH (rx) : ORIGIN = 0x80000000, LENGTH = 512K
+    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 512K
     RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 128K
 }
 
 SECTIONS {
 
-    .text {
-        _text_start = .;
-        *(.vector_table)
-        *(.text)
-        *(.rodata)
+      .isr_vector :
+      {
         . = ALIGN(4);
-        _text_end = .;
+        KEEP(*(.isr_vector)) /* Startup code */
+        . = ALIGN(4);
+      } >FLASH
+
+    .text : {
+        . = ALIGN(4);
+        _start_text = .;
+        *(.text)
+        *(.text*)
+        *(.rodata)
+
+        . = ALIGN(4);
+        _end_text = .;
+        _stored_data = .;
     } > FLASH
 
     .data : AT(ADDR(.text) + SIZEOF(.text)) {
-        _data_start = .;
+        _start_data = .;
         *(.data)
+        *(.data*)
         . = ALIGN(4);
-        _data_end = .;
+        _end_data = .;
     } > RAM
 
-    .bss {
-        _bss_start = .;
+    .bss : {
+        _start_bss = .;
         *(.bss)
+        *(.bss*)
         . = ALIGN(4);
-        _bss_end = .;
+        _end_bss = .;
     } > RAM
 
-    _fiq_stack_start = ADDR(.bss) + SIZEOF(.bss);
-    _fiq_stack_end = _fiq_stack_start + 0x1000; /* 4 KB */
-
-    _irq_stack_start = _fiq_stack_end;
-    _irq_stack_end = _irq_stack_start + 0x1000; /* 4 KB */
-
-    _stack_start = _irq_stack_end;
-    _stack_end = _stack_start + 0x1000; /* 4 KB */
-
-    _irq_stack_size = _irq_stack_end - _irq_stack_start;
-    _fiq_stack_size = _fiq_stack_end - _fiq_stack_start;
-
+    END_STACK = ORIGIN(RAM) + LENGTH(RAM);
 }
 

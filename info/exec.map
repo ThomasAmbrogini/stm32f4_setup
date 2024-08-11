@@ -1,0 +1,213 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+RAM              0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+
+.isr_vector     0x08000000      0x198
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x198 startup.o
+                0x08000000                isr_vector
+                0x08000198                        . = ALIGN (0x4)
+
+.text           0x08000198       0xc4
+                0x08000198                        . = ALIGN (0x4)
+                0x08000198                        _start_text = .
+ *(.text)
+ .text          0x08000198        0x0 startup.o
+ .text          0x08000198        0x0 main.o
+ *(.text*)
+ .text.defaultHandler
+                0x08000198        0x8 startup.o
+                0x08000198                EXTI1Handler
+                0x08000198                DMA2Stream2Handler
+                0x08000198                I2C3ErrHandler
+                0x08000198                USART6Handler
+                0x08000198                EXTI17_RTCAlarmHandler
+                0x08000198                SPI2Handler
+                0x08000198                I2C2EvHandler
+                0x08000198                DMA2Stream5Handler
+                0x08000198                EXTI3Handler
+                0x08000198                TIM1TrgComm_TIM11Handler
+                0x08000198                DMA2Stream3Handler
+                0x08000198                I2C1EvHandler
+                0x08000198                DMA1Stream3Handler
+                0x08000198                EXTI18_OTGFSWkUpHandler
+                0x08000198                SPI5Handler
+                0x08000198                defaultHandler
+                0x08000198                EXTI0Handler
+                0x08000198                TIM3Handler
+                0x08000198                RCCHandler
+                0x08000198                DMA1Stream4Handler
+                0x08000198                EXTI15_10Handler
+                0x08000198                OTGFSHandler
+                0x08000198                I2C3EvHandler
+                0x08000198                SDIOHandler
+                0x08000198                SVCallHandler
+                0x08000198                TIM1CCHandler
+                0x08000198                USART1Handler
+                0x08000198                TIM1Up_TIM10Handler
+                0x08000198                USART2Handler
+                0x08000198                DMA1Stream6Handler
+                0x08000198                WWDGHandler
+                0x08000198                memManageHandler
+                0x08000198                DMA1Stream0Handler
+                0x08000198                I2C2ErrHandler
+                0x08000198                sysTickHandler
+                0x08000198                TIM4Handler
+                0x08000198                SPI3Handler
+                0x08000198                TIM1Break_TIM9Handler
+                0x08000198                DMA1Stream7Handler
+                0x08000198                DMA2Stream6Handler
+                0x08000198                EXTI21_Tamp_StampHandler
+                0x08000198                TIM2Handler
+                0x08000198                EXTI9_5Handler
+                0x08000198                DMA2Stream4Handler
+                0x08000198                I2C1ErrHandler
+                0x08000198                EXTI2Handler
+                0x08000198                FlashHandler
+                0x08000198                EXTI16_PVDHandler
+                0x08000198                debugMonitorHandler
+                0x08000198                EXTI4Handler
+                0x08000198                DMA2Stream0Handler
+                0x08000198                ADCHandler
+                0x08000198                DMA2Stream7Handler
+                0x08000198                pendSVHandler
+                0x08000198                NMIHandler
+                0x08000198                SPI1Handler
+                0x08000198                usageFaultHandler
+                0x08000198                FPUHandler
+                0x08000198                DMA1Stream1Handler
+                0x08000198                DMA1Stream2Handler
+                0x08000198                EXTI22_RTCWakeUpHandler
+                0x08000198                DMA2Stream1Handler
+                0x08000198                busFaultHandler
+                0x08000198                TIM5Handler
+                0x08000198                hardFaultHandler
+                0x08000198                SPI4Handler
+                0x08000198                DMA1Stream5Handler
+ .text.resetHandler
+                0x080001a0       0x18 startup.o
+                0x080001a0                resetHandler
+ .text.initializeBSS
+                0x080001b8       0x38 startup.o
+                0x080001b8                initializeBSS
+ .text.copyDataSectionToRAM
+                0x080001f0       0x48 startup.o
+                0x080001f0                copyDataSectionToRAM
+ .text.systemInit
+                0x08000238        0xe startup.o
+                0x08000238                systemInit
+ *fill*         0x08000246        0x2 
+ .text.main     0x08000248       0x14 main.o
+                0x08000248                main
+ *(.rodata)
+                0x0800025c                        . = ALIGN (0x4)
+                0x0800025c                        _end_text = .
+                0x0800025c                        _stored_data = .
+
+.glue_7         0x0800025c        0x0
+ .glue_7        0x0800025c        0x0 linker stubs
+
+.glue_7t        0x0800025c        0x0
+ .glue_7t       0x0800025c        0x0 linker stubs
+
+.vfp11_veneer   0x0800025c        0x0
+ .vfp11_veneer  0x0800025c        0x0 linker stubs
+
+.v4_bx          0x0800025c        0x0
+ .v4_bx         0x0800025c        0x0 linker stubs
+
+.iplt           0x0800025c        0x0
+ .iplt          0x0800025c        0x0 startup.o
+
+.rel.dyn        0x0800025c        0x0
+ .rel.iplt      0x0800025c        0x0 startup.o
+
+.data           0x20000000        0x4 load address 0x0800025c
+                0x20000000                        _start_data = .
+ *(.data)
+ .data          0x20000000        0x0 startup.o
+ .data          0x20000000        0x0 main.o
+ *(.data*)
+ .data.a        0x20000000        0x4 main.o
+                0x20000000                a
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _end_data = .
+
+.igot.plt       0x20000004        0x0 load address 0x08000260
+ .igot.plt      0x20000004        0x0 startup.o
+
+.bss            0x20000004        0xc load address 0x08000260
+                0x20000004                        _start_bss = .
+ *(.bss)
+ .bss           0x20000004        0x0 startup.o
+ .bss           0x20000004        0x0 main.o
+ *(.bss*)
+ .bss.b         0x20000004        0x4 startup.o
+                0x20000004                b
+ .bss.c         0x20000008        0x4 startup.o
+                0x20000008                c
+ .bss.d         0x2000000c        0x4 startup.o
+                0x2000000c                d
+                0x20000010                        . = ALIGN (0x4)
+                0x20000010                        _end_bss = .
+                0x20020000                        END_STACK = (ORIGIN (RAM) + LENGTH (RAM))
+LOAD startup.o
+LOAD main.o
+OUTPUT(exec.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x21e
+ .debug_info    0x00000000      0x1ca startup.o
+ .debug_info    0x000001ca       0x54 main.o
+
+.debug_abbrev   0x00000000      0x17e
+ .debug_abbrev  0x00000000      0x133 startup.o
+ .debug_abbrev  0x00000133       0x4b main.o
+
+.debug_aranges  0x00000000       0x60
+ .debug_aranges
+                0x00000000       0x40 startup.o
+ .debug_aranges
+                0x00000040       0x20 main.o
+
+.debug_rnglists
+                0x00000000       0x3e
+ .debug_rnglists
+                0x00000000       0x2b startup.o
+ .debug_rnglists
+                0x0000002b       0x13 main.o
+
+.debug_line     0x00000000      0x1bf
+ .debug_line    0x00000000      0x183 startup.o
+ .debug_line    0x00000183       0x3c main.o
+
+.debug_str      0x00000000      0x1dc
+ .debug_str     0x00000000      0x1dc startup.o
+                                0x212 (size before relaxing)
+ .debug_str     0x000001dc       0xe1 main.o
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 startup.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045       0x46 main.o
+
+.ARM.attributes
+                0x00000000       0x34
+ .ARM.attributes
+                0x00000000       0x34 startup.o
+ .ARM.attributes
+                0x00000034       0x34 main.o
+
+.debug_frame    0x00000000       0xdc
+ .debug_frame   0x00000000       0xb4 startup.o
+ .debug_frame   0x000000b4       0x28 main.o
