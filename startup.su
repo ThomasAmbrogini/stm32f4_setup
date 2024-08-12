@@ -1,5 +1,0 @@
-startup.c:195:6:defaultHandler	4	static
-startup.c:199:6:resetHandler	8	static
-startup.c:211:6:initializeBSS	16	static
-startup.c:222:6:copyDataSectionToRAM	16	static
-startup.c:243:6:systemInit	4	static
