@@ -8,10 +8,14 @@ target_compile_options(startup PRIVATE -Wno-implicit-function-declaration)
 set(SOURCES main.c)
 add_executable(main ${SOURCES})
 set_target_properties(main PROPERTIES OUTPUT_NAME "main.elf")
-target_link_libraries(main board_options)
 target_link_libraries(main compiler_warnings)
+
+target_link_libraries(main options)
 target_link_libraries(main linker_options)
-target_link_libraries(main startup)
+
+if (EMBEDDED_TARGET)
+    target_link_libraries(main startup)
+endif ()
 
 add_custom_command(TARGET main
                    POST_BUILD
