@@ -1,9 +1,11 @@
 set(STARTUP startup.c)
 add_library(startup ${STARTUP})
 target_link_libraries(startup compiler_warnings)
-target_link_libraries(startup board_options)
+target_link_libraries(startup options)
 # In this way there is no warning about missing main for startup file
 target_compile_options(startup PRIVATE -Wno-implicit-function-declaration)
+
+add_subdirectory(usart)
 
 set(SOURCES main.c)
 add_executable(main ${SOURCES})
@@ -12,6 +14,7 @@ target_link_libraries(main compiler_warnings)
 
 target_link_libraries(main options)
 target_link_libraries(main linker_options)
+target_link_libraries(main usart)
 
 if (EMBEDDED_TARGET)
     target_link_libraries(main startup)
