@@ -20,6 +20,7 @@ SECTIONS {
         *(.text)
         *(.text*)
         *(.rodata)
+        *(.rodata*)
 
         . = ALIGN(4);
         _end_text = .;
