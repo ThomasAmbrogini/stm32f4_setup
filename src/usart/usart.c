@@ -1,6 +1,10 @@
 #include "usart.h"
 
+#include "stm32f4xx.h"
+
 static Usart * p_usart = (Usart *) USART6;
+
+static void configureGpio(void);
 
 /**
   * @brief Used for testing to place a different value to the usart 
@@ -21,6 +25,11 @@ void initStruct(Usart* p_usart_address) {
   *
   */
 void usartInit(void) {
+    /* the clock of the peripheral has to be enabled */
+    RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+
+    configureGpio();
+
     p_usart->cr1 |= 1 << UE;
     p_usart->cr1 &= ~(1 << M);
 
@@ -33,8 +42,9 @@ void usartInit(void) {
 }
 
 void usartPutchar(char data) {
-    while (p_usart->sr & TXE);
+    while (!(p_usart->sr & (1 << TXE)));
     p_usart->dr = data;
+    while (!(p_usart->sr & (1 << TC)));
 }
 
 void usartWrite(const char * data) {
@@ -42,5 +52,40 @@ void usartWrite(const char * data) {
         usartPutchar(*data);
         ++data;
     }
+}
+
+void configureGpio(void) {
+    /* The clock of the GPIO pins that will be used for the TX/RX has to be
+     * enabled 
+     */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+
+    /* Moder of the TX pin should be configured as AF */
+    GPIOC->MODER &= ~(0x3 << (TX_PIN * 2));
+    GPIOC->MODER |= (0x2 << (TX_PIN * 2));
+
+    /* The output type is Push/pull */
+    GPIOC->OTYPER &= ~(0x1 << (TX_PIN));
+
+    GPIOC->PUPDR &= ~(0x3 << (TX_PIN * 2));
+    GPIOC->PUPDR |= (0x0 << (TX_PIN * 2));
+
+    /* Moder of the RX pin should be configured as AF */
+    GPIOC->MODER &= ~(0x3 << (RX_PIN * 2));
+    GPIOC->MODER |= (0x2 << (RX_PIN * 2));
+
+    /* The output type is Push/pull */
+    GPIOC->OTYPER &= ~(0x1 << (RX_PIN));
+
+    GPIOC->PUPDR &= ~(0x3 << (RX_PIN * 2));
+    GPIOC->PUPDR |= (0x0 << (RX_PIN * 2));
+
+    /* Pinmuxing for the TX pin, 0x8 is UART6 AF */
+    GPIOC->AFR[0] &= ~(0xF << (TX_PIN * 4)); 
+    GPIOC->AFR[0] |= (0x8 << (TX_PIN * 4));
+
+    /* Pinmuxing for the RX pin, 0x8 is UART6 AF */
+    GPIOC->AFR[0] &= ~(0xF << (RX_PIN * 4)); 
+    GPIOC->AFR[0] |= (0x8 << (RX_PIN * 4));
 }
 

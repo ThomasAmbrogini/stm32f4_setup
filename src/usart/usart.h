@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stm32f4xx.h"
+
 /*
  * ### Procedure to start a transmission 
 
@@ -12,12 +14,14 @@ write
     has been transmitted
 
 */
-
 #include <stdint.h>
 
-#define USART6 (0x40001400U)
+#define TX_PIN 0x06U
+#define RX_PIN 0x07U
 
 /* SR bits */
+
+#define TC  0x06
 #define TXE 0x07
 
 /* BRR bits */
@@ -47,14 +51,14 @@ write
 #define STOP_BIT_0 0x0C
 #define STOP_BIT_1 0x0D
 
-typedef volatile struct __attribute__((__packed__)) {
-    uint32_t sr;
-    uint32_t dr;
-    uint32_t brr;
-    uint32_t cr1;
-    uint32_t cr2;
-    uint32_t cr3;
-    uint32_t gtpr;
+typedef struct {
+  __IO uint32_t sr;         /*!< USART Status register,                   Address offset: 0x00 */
+  __IO uint32_t dr;         /*!< USART Data register,                     Address offset: 0x04 */
+  __IO uint32_t brr;        /*!< USART Baud rate register,                Address offset: 0x08 */
+  __IO uint32_t cr1;        /*!< USART Control register 1,                Address offset: 0x0C */
+  __IO uint32_t cr2;        /*!< USART Control register 2,                Address offset: 0x10 */
+  __IO uint32_t cr3;        /*!< USART Control register 3,                Address offset: 0x14 */
+  __IO uint32_t gtpr;       /*!< USART Guard time and prescaler register, Address offset: 0x18 */
 } Usart;
 
 #ifdef __cplusplus
