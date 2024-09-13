@@ -5,6 +5,7 @@ target_link_libraries(startup options)
 # In this way there is no warning about missing main for startup file
 target_compile_options(startup PRIVATE -Wno-implicit-function-declaration)
 
+add_subdirectory(chip_definitions)
 add_subdirectory(usart)
 
 set(SOURCES main.c)
@@ -14,7 +15,7 @@ target_link_libraries(main compiler_warnings)
 
 target_link_libraries(main options)
 target_link_libraries(main linker_options)
-target_link_libraries(main usart)
+target_link_libraries(main usart chip_definitions)
 
 if (EMBEDDED_TARGET)
     target_link_libraries(main startup)

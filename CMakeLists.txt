@@ -11,6 +11,7 @@ option(EMBEDDED_TARGET "Use the compiler for the embedded target" ON)
 include(generic_options)
 add_library(options INTERFACE)
 target_compile_options(options INTERFACE ${GENERIC_OPTIONS})
+target_compile_definitions(options INTERFACE STM32F411xE)
 
 if (EMBEDDED_TARGET)
     include(board_options)
