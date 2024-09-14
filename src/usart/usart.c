@@ -5,86 +5,137 @@
 static Usart * p_usart = (Usart *) USART6;
 
 static void configureGpio(void);
+static void usartPutchar(char data);
 
 /**
-  * @brief Used for testing to place a different value to the usart 
-  * pointer
+  * @brief Used for testing to place a different value to the usart pointer.
+  * @param [in] p_usart_address address passed from the software to not use the
+  *             fixed one of the actual peripheral.
   */
 void initStruct(Usart* p_usart_address) {
     p_usart = p_usart_address;
 }
 
 /**
-  * @brief Initialization of the usart driver
-  * @description 1. set the UE bit in CR1 register to 1
-  *              2. set the M bit in CR1 register to 0 for 8 data bits
-  *              3. set the number of stop bits (00 to have 1) in CR2 register
-  *              4. set the baud rate in BRR register: right now for 9600
-  *              5. set the TE bit in CR1 register (sends an idle frame as 
-  *                 first transmission)
-  *
-  */
-void usartInit(void) {
-    /* the clock of the peripheral has to be enabled */
-    RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
-
+ * @brief Initialization of the usart driver.
+ * @details
+ *    1. clock of the USART peripheral has to be enabled.
+ *    2. set the UE bit in CR1 register to 1 to enable the peripheral.
+ *    3. set the M bit in CR1 register to decide the number of data bits.
+ *    4. set the number of stop bits in CR2 register.
+ *    5. set the baud rate in BRR register.
+ *    6. set the TE bit in CR1 register (sends an idle frame as first
+ *       transmission).
+ * @param [in] config: configuration to apply to the USART driver.
+ */
+void usartInit(UsartConfig * config) {
     configureGpio();
 
-    p_usart->cr1 |= 1 << UE;
-    p_usart->cr1 &= ~(1 << M);
+    switch(config->peripheral) {
+        case USART1_P:
+            RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+            p_usart = (Usart *) USART1;
+            break;
+        case USART2_P:
+            RCC->APB2ENR |= RCC_APB1ENR_USART2EN;
+            p_usart = (Usart *) USART2;
+            break;
+        case USART6_P:
+            RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+            p_usart = (Usart *) USART6;
+            break;
+    }
 
-    p_usart->cr2 &= ~(1 << STOP_BIT_0);
-    p_usart->cr2 &= ~(1 << STOP_BIT_1);
+    p_usart->cr1 |= USART_CR1_UE;
+
+    switch(config->data_bits) {
+        case 8:
+            p_usart->cr1 &= ~(USART_CR1_M);
+            break;
+        case 9:
+            p_usart->cr1 |= USART_CR1_M;
+            break;
+    }
+
+    switch(config->stop_bits) {
+        case USART_STOP_BIT_0_5:
+            p_usart->cr2 &= ~(USART_CR2_STOP);
+            p_usart->cr2 |= (USART_CR2_STOP_0);
+            break;
+        case USART_STOP_BIT_1:
+            p_usart->cr2 &= ~(USART_CR2_STOP);
+            break;
+        case USART_STOP_BIT_1_5:
+            p_usart->cr2 |= (USART_CR2_STOP);
+            break;
+        case USART_STOP_BIT_2:
+            p_usart->cr2 &= ~(USART_CR2_STOP);
+            p_usart->cr2 |= (USART_CR2_STOP_1);
+            break;
+    }
 
     p_usart->brr = 0x0683;
 
-    p_usart->cr1 |= (1 << TE);
+    p_usart->cr1 |= (USART_CR1_TE);
 }
 
-void usartPutchar(char data) {
-    while (!(p_usart->sr & (1 << TXE)));
-    p_usart->dr = data;
-    while (!(p_usart->sr & (1 << TC)));
-}
-
+/**
+ * @brief Function used to send data
+ * @details
+ *    Once the data is written it waits for the TC bit to be set by the
+ *    hardware, it is needed to wait for the TC once the last data has been
+ *    written to the DR register.
+ */
 void usartWrite(const char * data) {
     while (*data) {
         usartPutchar(*data);
         ++data;
     }
+    while (!(p_usart->sr & USART_SR_TC));
 }
 
+/**
+ * @brief utility function used by usartWrite to send a char at a time.
+ * @details
+ *    It waits for the TXE bit to be set, which means that the DR register can
+ *    be written, since the previous data has already been send to the shift
+ *    register.
+ */
+void usartPutchar(char data) {
+    while (!(p_usart->sr & USART_SR_TXE));
+    p_usart->dr = data;
+}
+
+/**
+ * @brief sets the configuration for the TX and RX pin to be used.
+ * @details
+ *    1.  Enables the clock for the GPIO port.
+ *    2.  Configures the GPIO pins: moder to AF, OTYPER push/pull and without
+ *        pull up and push down resistors.
+ *    3.  Set the GPIO to use the alternate function of the USART.
+ */
 void configureGpio(void) {
-    /* The clock of the GPIO pins that will be used for the TX/RX has to be
-     * enabled 
-     */
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 
-    /* Moder of the TX pin should be configured as AF */
     GPIOC->MODER &= ~(0x3 << (TX_PIN * 2));
     GPIOC->MODER |= (0x2 << (TX_PIN * 2));
 
-    /* The output type is Push/pull */
     GPIOC->OTYPER &= ~(0x1 << (TX_PIN));
 
     GPIOC->PUPDR &= ~(0x3 << (TX_PIN * 2));
     GPIOC->PUPDR |= (0x0 << (TX_PIN * 2));
 
-    /* Moder of the RX pin should be configured as AF */
     GPIOC->MODER &= ~(0x3 << (RX_PIN * 2));
     GPIOC->MODER |= (0x2 << (RX_PIN * 2));
 
-    /* The output type is Push/pull */
     GPIOC->OTYPER &= ~(0x1 << (RX_PIN));
 
     GPIOC->PUPDR &= ~(0x3 << (RX_PIN * 2));
     GPIOC->PUPDR |= (0x0 << (RX_PIN * 2));
 
-    /* Pinmuxing for the TX pin, 0x8 is UART6 AF */
     GPIOC->AFR[0] &= ~(0xF << (TX_PIN * 4)); 
     GPIOC->AFR[0] |= (0x8 << (TX_PIN * 4));
 
-    /* Pinmuxing for the RX pin, 0x8 is UART6 AF */
     GPIOC->AFR[0] &= ~(0xF << (RX_PIN * 4)); 
     GPIOC->AFR[0] |= (0x8 << (RX_PIN * 4));
 }

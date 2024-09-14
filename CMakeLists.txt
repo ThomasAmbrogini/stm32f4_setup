@@ -36,6 +36,7 @@ target_link_options(linker_options INTERFACE
 if (EMBEDDED_TARGET)
     set(BOARD_LINKER_OPTIONS ${BOARD_OPTIONS} 
                              -T ${CMAKE_SOURCE_DIR}/tools/linkscript.ld)
+    target_link_libraries(linker_options INTERFACE "-Wl,--gc-sections")
     target_link_options(linker_options INTERFACE ${BOARD_LINKER_OPTIONS})
 endif ()
 
