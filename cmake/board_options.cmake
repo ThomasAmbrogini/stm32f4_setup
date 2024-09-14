@@ -5,5 +5,6 @@ set(BOARD_OPTIONS -mcpu=cortex-m4
                   -nostdlib
                   -ffreestanding
                   --specs=nano.specs
+                  -O0
 )
 

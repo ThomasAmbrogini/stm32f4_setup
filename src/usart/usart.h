@@ -45,6 +45,7 @@ extern "C" {
 void initStruct(Usart * p_usart_address);
 void usartInit(UsartConfig * config);
 void usartWrite(const char * data);
+char usartRead(void);
 
 #ifdef __cplusplus
 }

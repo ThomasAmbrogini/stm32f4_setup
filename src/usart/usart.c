@@ -77,6 +77,7 @@ void usartInit(UsartConfig * config) {
     p_usart->brr = 0x0683;
 
     p_usart->cr1 |= (USART_CR1_TE);
+    p_usart->cr1 |= (USART_CR1_RE);
 }
 
 /**
@@ -104,6 +105,19 @@ void usartWrite(const char * data) {
 void usartPutchar(char data) {
     while (!(p_usart->sr & USART_SR_TXE));
     p_usart->dr = data;
+}
+
+/**
+ * @brief read a single char from the USART
+ * @details
+ *    When the RXNE bit in the status register is set it means that the value
+ *    has been shifted to the DR and it can be read.
+ * @params [out] the read character
+ */
+char usartRead(void) {
+    while (!(p_usart->sr & USART_SR_RXNE));
+    char c = p_usart->dr;
+    return c;
 }
 
 /**
