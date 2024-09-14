@@ -46,6 +46,7 @@ void initStruct(Usart * p_usart_address);
 void usartInit(UsartConfig * config);
 void usartWrite(const char * data);
 char usartRead(void);
+void usartPutchar(char data);
 
 #ifdef __cplusplus
 }

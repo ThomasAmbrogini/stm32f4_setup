@@ -3,7 +3,6 @@ set(BOARD_OPTIONS -mcpu=cortex-m4
                   -mthumb
                   -mfloat-abi=hard 
                   -nostdlib
-                  -ffreestanding
                   --specs=nano.specs
                   -O0
 )

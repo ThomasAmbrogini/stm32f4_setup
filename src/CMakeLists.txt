@@ -7,6 +7,7 @@ target_compile_options(startup PRIVATE -Wno-implicit-function-declaration)
 
 add_subdirectory(chip_definitions)
 add_subdirectory(usart)
+add_subdirectory(gpio)
 
 set(SOURCES main.c)
 add_executable(main ${SOURCES})
@@ -15,7 +16,7 @@ target_link_libraries(main compiler_warnings)
 
 target_link_libraries(main options)
 target_link_libraries(main linker_options)
-target_link_libraries(main usart chip_definitions)
+target_link_libraries(main gpio usart chip_definitions)
 
 if (EMBEDDED_TARGET)
     target_link_libraries(main startup)

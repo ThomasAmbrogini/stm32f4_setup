@@ -5,7 +5,6 @@
 static Usart * p_usart = (Usart *) USART6;
 
 static void configureGpio(void);
-static void usartPutchar(char data);
 
 /**
   * @brief Used for testing to place a different value to the usart pointer.
