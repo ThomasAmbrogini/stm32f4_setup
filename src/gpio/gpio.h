@@ -12,7 +12,7 @@ typedef enum {
     GPIO_PORT_C,
     GPIO_PORT_D,
     GPIO_PORT_E,
-    GPIO_PORT_H
+    GPIO_PORT_H = 7
 } GpioPort;
 
 typedef enum {
@@ -41,16 +41,25 @@ typedef enum {
     GPIO_ANALOG
 } GpioType; 
 
+typedef enum {
+    EXTI_FALLING_EDGE,
+    EXTI_RISING_EDGE,
+    EXTI_TRIGGER_BOTH,
+} GpioTriggerType;
+
 typedef struct {
     GpioPort port;
     GpioPin pin;
     GpioType type;
+    GpioTriggerType trigger_type;
 } GpioConfig;
 
 void gpioInit(GpioConfig * config);
 void gpioTurnOn(GpioConfig * config);
 void gpioTurnOff(GpioConfig * config);
 bool gpioReadValue(GpioConfig * config);
+
+void gpioEXTISetUp(GpioConfig * config);
 
 #ifdef __cplusplus
 }

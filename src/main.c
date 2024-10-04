@@ -1,6 +1,8 @@
 #include "gpio.h"
 #include "usart.h"
 
+#include "stm32f4xx.h"
+
 typedef enum {
     COMMAND_INVALID,
     COMMAND_LED_TURN_ON,
@@ -17,10 +19,23 @@ int strcmp(const char *s1, const char *s2) {
 
 void *memset(void *ptr, int value, size_t num) {
     unsigned char *p = ptr;
-    while (num--) {
+    volatile size_t v_num = num;
+    while (v_num--) {
         *p++ = (unsigned char)value;
     }
     return ptr;
+}
+
+void *memcpy(void *dest, const void *src, size_t n) {
+    char *d = (char *)dest;
+    const char *s = (const char *)src;
+
+    // Copy n bytes from src to dest
+    while (n--) {
+        *d++ = *s++;
+    }
+
+    return dest;
 }
 
 static Command interpretMessage(const char * buffer);
@@ -28,6 +43,29 @@ static void executeCommand(Command com);
 
 static GpioConfig led_config;
 static GpioConfig button_config;
+static GpioConfig analyze_pin_config;
+
+volatile static bool previous_value = false;
+volatile static bool analyze_value = false;
+
+void EXTI0Handler(void) {
+    gpioTurnOn(&analyze_pin_config);
+
+    if (EXTI->PR & (1 << GPIO_PIN_0)) {
+        // Clear the EXTI status flag.
+        EXTI->PR |= (1 << GPIO_PIN_0);
+
+        if (previous_value) {
+            gpioTurnOff(&led_config);
+        } else {
+            gpioTurnOn(&led_config);
+        }
+
+        previous_value = !previous_value;
+    }
+
+    gpioTurnOff(&analyze_pin_config);
+}
 
 int main() {
     const char * msg = "Start reception!\r\n";
@@ -49,24 +87,19 @@ int main() {
     led_config.type = GPIO_OUTPUT;
     gpioInit(&led_config);
 
+    analyze_pin_config.port = GPIO_PORT_A;
+    analyze_pin_config.pin = GPIO_PIN_8;
+    analyze_pin_config.type = GPIO_OUTPUT;
+    gpioInit(&analyze_pin_config);
+
     button_config.port = GPIO_PORT_A;
     button_config.pin = GPIO_PIN_0;
     button_config.type = GPIO_INPUT;
+    button_config.trigger_type = EXTI_RISING_EDGE;
     gpioInit(&button_config);
+    gpioEXTISetUp(&button_config);
 
     while (1) {
-        if (gpioReadValue(&button_config)) {
-            if (!previous_value) {
-                gpioTurnOn(&led_config); 
-                previous_value = true;
-            }
-        } else {
-            if (previous_value) {
-                gpioTurnOff(&led_config);
-                previous_value = false;
-            }
-        }
-
         c = usartRead();
 
         if (c == '\r') {
@@ -104,9 +137,11 @@ void executeCommand(Command com) {
     switch (com) {
         case COMMAND_LED_TURN_ON:
             gpioTurnOn(&led_config);
+            previous_value = true;
             break;
         case COMMAND_LED_TURN_OFF:
             gpioTurnOff(&led_config);
+            previous_value = false;
             break;
         default:
             break;
