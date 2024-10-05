@@ -5,8 +5,6 @@ project(stm32f411_setup
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-option(EMBEDDED_TARGET "Use the compiler for the embedded target" ON)
-
 include(generic_options)
 add_library(options INTERFACE)
 target_compile_options(options INTERFACE ${GENERIC_OPTIONS})
@@ -18,17 +16,6 @@ set(COMPILER_WARNINGS -Wall
                       -Wextra)
 add_library(compiler_warnings INTERFACE)
 target_compile_options(compiler_warnings INTERFACE ${COMPILER_WARNING})
-
-add_library(linker_options INTERFACE)
-target_link_options(linker_options INTERFACE
-    LINKER:-Map=${CMAKE_BINARY_DIR}/info/main.map
-)
-
-if (EMBEDDED_TARGET)
-    set(BOARD_LINKER_OPTIONS -T ${CMAKE_SOURCE_DIR}/tools/linkscript.ld)
-    target_link_libraries(linker_options INTERFACE "-Wl,--gc-sections")
-    target_link_options(linker_options INTERFACE ${BOARD_LINKER_OPTIONS})
-endif ()
 
 add_subdirectory(src)
 

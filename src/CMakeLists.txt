@@ -15,12 +15,8 @@ set_target_properties(main PROPERTIES OUTPUT_NAME "main.elf")
 target_link_libraries(main compiler_warnings)
 
 target_link_libraries(main options)
-target_link_libraries(main linker_options)
 target_link_libraries(main gpio usart chip_definitions)
-
-if (EMBEDDED_TARGET)
-    target_link_libraries(main startup)
-endif ()
+target_link_libraries(main startup)
 
 add_custom_command(TARGET main
                    POST_BUILD
