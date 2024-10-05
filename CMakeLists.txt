@@ -5,7 +5,6 @@ project(stm32f411_setup
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-option(ENABLE_DEBUG_OPTIONS "Add Debug Options to the compilation" ON)
 option(EMBEDDED_TARGET "Use the compiler for the embedded target" ON)
 
 include(generic_options)
@@ -18,10 +17,7 @@ if (EMBEDDED_TARGET)
     target_compile_options(options INTERFACE ${BOARD_OPTIONS})
 endif ()
 
-if (ENABLE_DEBUG_OPTIONS)
-    include(debug_options)
-    target_link_libraries(options INTERFACE debug_options)
-endif ()
+include(build_type)
 
 set(COMPILER_WARNINGS -Wall
                       -Wextra)

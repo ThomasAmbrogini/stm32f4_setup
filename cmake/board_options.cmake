@@ -4,6 +4,5 @@ set(BOARD_OPTIONS -mcpu=cortex-m4
                   -mfloat-abi=hard 
                   -nostdlib
                   --specs=nano.specs
-                  -O0
 )
 
