@@ -4,8 +4,16 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(COMPILER_PATH /opt/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi/bin/)
 set(COMPILER_PREFIX arm-none-eabi-)
 
-set(CMAKE_C_COMPILER ${COMPILER_PATH}${COMPILER_PREFIX}gcc)
+set(STM32F411_OPTIONS -mcpu=cortex-m4
+                      -mfpu=fpv4-sp-d16
+                      -mthumb
+                      -mfloat-abi=hard
+                      -nostdlib)
+
+set(CMAKE_C_COMPILER ${COMPILER_PATH}${COMPILER_PREFIX}gcc ${STM32F411_OPTIONS})
 set(CMAKE_CXX_COMPILER ${COMPILER_PATH}${COMPILER_PREFIX}g++)
+
+set(CMAKE_C_FLAGS_INIT --specs=nano.specs)
 
 set(CMAKE_LINKER
     ${COMPILER_PREFIX}ld

@@ -12,11 +12,6 @@ add_library(options INTERFACE)
 target_compile_options(options INTERFACE ${GENERIC_OPTIONS})
 target_compile_definitions(options INTERFACE STM32F411xE)
 
-if (EMBEDDED_TARGET)
-    include(board_options)
-    target_compile_options(options INTERFACE ${BOARD_OPTIONS})
-endif ()
-
 include(build_type)
 
 set(COMPILER_WARNINGS -Wall
@@ -30,8 +25,7 @@ target_link_options(linker_options INTERFACE
 )
 
 if (EMBEDDED_TARGET)
-    set(BOARD_LINKER_OPTIONS ${BOARD_OPTIONS} 
-                             -T ${CMAKE_SOURCE_DIR}/tools/linkscript.ld)
+    set(BOARD_LINKER_OPTIONS -T ${CMAKE_SOURCE_DIR}/tools/linkscript.ld)
     target_link_libraries(linker_options INTERFACE "-Wl,--gc-sections")
     target_link_options(linker_options INTERFACE ${BOARD_LINKER_OPTIONS})
 endif ()
