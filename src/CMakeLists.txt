@@ -20,25 +20,21 @@ target_link_libraries(main startup)
 
 add_custom_command(TARGET main
                    POST_BUILD
-                   COMMAND ${CMAKE_OBJCOPY} -O binary main.elf main.bin 
+                   COMMAND ${CMAKE_OBJCOPY} -O binary $<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>main.elf $<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>main.bin
                    COMMENT "Converting ELF to binary")
-
-# Create the info directory
-set(INFO_DIR "${CMAKE_BINARY_DIR}/info")
-file(MAKE_DIRECTORY ${INFO_DIR})
 
 add_custom_command(TARGET main
                    POST_BUILD
-                   COMMAND ${CMAKE_OBJDUMP} -D main.elf > ${INFO_DIR}/disassembly
+                   COMMAND ${CMAKE_OBJDUMP} -D $<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>main.elf > ${CMAKE_BINARY_DIR}/$<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>${INFO_DIR}/disassembly
                    COMMENT "Generating disassembly")
 
 add_custom_command(TARGET main
                    POST_BUILD
-                   COMMAND ${CMAKE_OBJDUMP} -h main.elf > ${INFO_DIR}/sections
+                   COMMAND ${CMAKE_OBJDUMP} -h $<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>main.elf > ${CMAKE_BINARY_DIR}/$<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>${INFO_DIR}/sections
                    COMMENT "Generating sections")
 
 add_custom_command(TARGET main
                    POST_BUILD
-                   COMMAND ${CMAKE_OBJDUMP} -t main.elf > ${INFO_DIR}/symbols
+                   COMMAND ${CMAKE_OBJDUMP} -t $<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>main.elf > ${CMAKE_BINARY_DIR}/$<IF:$<BOOL:${isMultiConfig}>,$<CONFIG>/,>${INFO_DIR}/symbols
                    COMMENT "Generating symbols")
 

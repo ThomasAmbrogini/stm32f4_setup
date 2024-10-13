@@ -13,8 +13,7 @@ set(STM32F411_OPTIONS -mcpu=cortex-m4
 set(CMAKE_C_COMPILER ${COMPILER_PATH}${COMPILER_PREFIX}gcc ${STM32F411_OPTIONS})
 set(CMAKE_CXX_COMPILER ${COMPILER_PATH}${COMPILER_PREFIX}g++)
 
-set(CMAKE_EXE_LINKER_FLAGS_INIT "-T${CMAKE_SOURCE_DIR}/tools/linkscript.ld -Wl,--gc-sections \
-                                 -Wl,-Map=${CMAKE_BINARY_DIR}/info/main.map")
+set(CMAKE_EXE_LINKER_FLAGS_INIT "-T${CMAKE_SOURCE_DIR}/tools/linkscript.ld -Wl,--gc-sections")
 
 set(CMAKE_C_FLAGS_INIT --specs=nano.specs)
 
