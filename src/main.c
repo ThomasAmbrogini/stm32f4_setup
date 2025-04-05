@@ -3,6 +3,17 @@
 
 #include "stm32f4xx.h"
 
+#define ASSERT(expr) ((expr) ? (void)0 : assert_failed(__FILE__, __LINE__))
+
+void assert_failed(const char *file, int line) {
+    // You can log the error, stop execution, or trigger a breakpoint
+    // In bare-metal, this could be sending output via UART, flashing an LED, or halting
+    while (true) {
+        // Implement your desired behavior here
+        // Example: halt the system or enter an infinite loop
+    }
+}
+
 typedef enum {
     COMMAND_INVALID,
     COMMAND_LED_TURN_ON,
@@ -99,6 +110,9 @@ int main() {
     gpioInit(&button_config);
     gpioEXTISetUp(&button_config);
 
+    RCC->CR |= RCC_CR_HSEON;
+    while (!(RCC->CR & RCC_CR_HSERDY)) { }
+
     while (1) {
         c = usartRead();
 
@@ -129,6 +143,8 @@ Command interpretMessage(const char * buffer) {
     } else if (strcmp(buffer, "led_off") == 0) {
         com = COMMAND_LED_TURN_OFF;
     }
+
+    ASSERT(com != COMMAND_INVALID);
 
     return com;
 }
